@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop | ESSENTIAL</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="shop-container">
+
+    <h1>OUR COLLECTION</h1>
+    <p>Discover timeless essentials for your wardrobe.</p>
+
+    <form class="filters" th:action="@{/shop}" method="get">
+        <select name="gender" aria-label="Filter by gender">
+            <option value="">All genders</option>
+            <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"
+                    th:selected="${g == selectedGender}">Women</option>
+        </select>
+
+        <select name="category" aria-label="Filter by category">
+            <option value="">All categories</option>
+            <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"
+                    th:selected="${c == selectedCategory}">Hoodies</option>
+        </select>
+
+        <button type="submit" class="btn">FILTER</button>
+        <a th:href="@{/shop}" class="filters-reset">RESET</a>
+    </form>
+
+    <p class="empty-note" th:if="${#lists.isEmpty(products)}">
+        No products match these filters. Try resetting them.
+    </p>
+
+    <div class="product-grid">
+
+        <div class="product-card" th:each="product : ${products}">
+
+            <img th:src="@{${product.imageUrl}}" th:alt="${product.name}">
+
+            <div class="product-info">
+                <h3 th:text="${product.name}">Product name</h3>
+
+                <p th:text="${product.category} + ' · ' + ${product.gender} + ' · ' + ${product.size}">Category</p>
+
+                <p class="product-price"
+                   th:text="${#numbers.formatDecimal(product.price, 1, 'NONE', 2, 'POINT')} + ' RON'">79.99 RON</p>
+
+                <p class="stock" th:classappend="${product.stock <= 0} ? 'stock-out'"
+                   th:text="${product.stock > 0} ? 'In stock: ' + ${product.stock} : 'Out of stock'">In stock: 20</p>
+
+                <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+                    <input type="hidden" name="returnUrl" th:value="${returnUrl}">
+                    <button type="submit" class="btn btn-block" th:disabled="${product.stock <= 0}">ADD TO BAG</button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</body>
+</html>

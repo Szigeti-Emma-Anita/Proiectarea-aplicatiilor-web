@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your bag | ESSENTIAL</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<div th:replace="~{fragments/layout :: alerts}"></div>
+
+<main class="shop-container">
+
+    <h1>YOUR BAG</h1>
+
+    <div class="cart-empty" th:if="${#lists.isEmpty(items)}">
+        <p>Your bag is empty.</p>
+        <a th:href="@{/shop}" class="btn">BROWSE THE COLLECTION</a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(items)}">
+
+        <table class="cart-table">
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${items}">
+                <td class="cart-product">
+                    <img th:src="@{${item.imageUrl}}" th:alt="${item.name}">
+                    <span th:text="${item.name}">Product name</span>
+                </td>
+                <td th:text="${#numbers.formatDecimal(item.unitPrice, 1, 'NONE', 2, 'POINT')} + ' RON'">79.99 RON</td>
+                <td>
+                    <form th:action="@{/cart/update/{id}(id=${item.productId})}" method="post" class="qty-form">
+                        <input type="number" name="quantity" min="0" th:value="${item.quantity}"
+                               aria-label="Quantity">
+                        <button type="submit" class="btn btn-small">UPDATE</button>
+                    </form>
+                </td>
+                <td th:text="${#numbers.formatDecimal(item.subtotal, 1, 'NONE', 2, 'POINT')} + ' RON'">79.99 RON</td>
+                <td>
+                    <form th:action="@{/cart/remove/{id}(id=${item.productId})}" method="post">
+                        <button type="submit" class="btn btn-small btn-outline">REMOVE</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="cart-summary">
+            <p class="cart-total">Total:
+                <strong th:text="${#numbers.formatDecimal(total, 1, 'NONE', 2, 'POINT')} + ' RON'">0.00 RON</strong>
+            </p>
+
+            <div class="cart-actions">
+                <a th:href="@{/shop}" class="btn btn-outline">CONTINUE SHOPPING</a>
+                <form th:action="@{/cart/clear}" method="post">
+                    <button type="submit" class="btn btn-outline">EMPTY BAG</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</body>
+</html>
